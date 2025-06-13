@@ -6,7 +6,7 @@ import numpy as np
 class wrapper_env(gym.Wrapper):    
     def step(self,action):
         state, reward, done, truncated, info = super().step(action)
-        reward = -1 + 1*(state[0] + 0.5) ** 2 + done*300
+        reward = -1 + 1*(state[0] + 0.5) ** 2 + done*200
         return state, reward, done, truncated, info
     
 env_name = "MountainCar-v0"
@@ -31,7 +31,7 @@ alpha = 0.05
 epsilon = 1.0
 min_epsilon = 0.1
 epsilon_decay = 0.99
-gamma = 0.9
+gamma = 0.99
 
 #shape[pos_div, velo_div, action_dim]
 q_table = np.array([[[0.0 for _ in range(action_dim)] for _ in range(velo_div)] for _ in range(pos_div)])
