@@ -1,6 +1,7 @@
 import gymnasium as gym
 import numpy as np
 import random
+import matplotlib.pyplot as plt
 
 env_name = "CliffWalking-v0"
 env = gym.make(env_name)
@@ -9,7 +10,7 @@ action_dim = env.action_space.n
 alpha = 0.05
 gamma = 0.99
 epsilon = 1.0
-min_epsilon = 0.2
+min_epsilon = 0.1
 epsilon_decay = 0.99
 
 print(env.observation_space, env.action_space) # Discreate 48, Discreate 4
@@ -25,7 +26,9 @@ def update_q_table(state, action , reward, next_state, done):
     loss = reward + gamma  * ((1-done) * np.max(q_table[next_state]) - q_table[state, action])
     q_table[state, action] += alpha * loss
 
-def train(train_episode = 1200, epsilon = epsilon):
+rewards = []
+def train(train_episode = 1000, epsilon = epsilon):
+    
     for episode in range(train_episode):
         step = 0
         total_reward = 0
@@ -43,6 +46,7 @@ def train(train_episode = 1200, epsilon = epsilon):
 
         if epsilon > min_epsilon:
             epsilon *= epsilon_decay
+        rewards.append(total_reward)
         print(f"\repisode:{episode+1:4d} total_reward:{total_reward:.2f} final_step:{step:3d}", end="")
 
 
@@ -60,8 +64,11 @@ def test(test_episode=5):
             state = next_state
 
             if done or truncated: break
-        print(f"episode:{episode+1:4d} total_reward:{total_reward:.2f} final_step:{step:3d}") #goal by 13 steps, it's a sucess
+        print(f"episode:{episode+1:4d} total_reward:{total_reward:.2f} final_step:{step:3d}") #goal at 13 steps, it's a sucess
 
 train()
+plt.plot(range(1,len(rewards)+1), rewards)
+plt.show()
+
 env = gym.make(env_name, render_mode = "human")
 test()
