@@ -4,6 +4,7 @@ from torch import nn
 from torch import distributions
 from collections import deque
 import numpy as np
+import time
 
 class PolicyNet(nn.Module):
     def __init__(self, observation_dim, action_dim):
@@ -15,7 +16,7 @@ class PolicyNet(nn.Module):
 
     def forward(self, state):
         x = torch.relu(self.fc1(state))
-        x = torch.relu(self.fc2(x))
+        #x = torch.relu(self.fc2(x))
         #確率の対数を返す　self.fc2(x) = (バッチサイズ, action_dim) ← -1で、action_dimに対して
         return torch.log_softmax(self.fc3(x), -1)  
     
@@ -93,6 +94,8 @@ env = gym.make(env_name)
 agent = Agent(env.observation_space.shape[0], env.action_space.n)
 rewards_list = deque(maxlen=100) #100エピソードの報酬
 def train(train_episode):
+    print(f"---TRAIN---")
+    timer = time.time()
     for episode in range(train_episode):
         step = 0
         total_reward = 0
@@ -112,9 +115,11 @@ def train(train_episode):
         print(f"\repisode:{episode+1}  reward:{total_reward}  mean_reward:{np.mean(rewards_list):.2f} step:{step}", end="")
         if np.mean(rewards_list) > 475:
             break
+    timer = time.time() - timer
+    print(f"\nTIME ELAPSED: {timer:.2f}sec")
 
 def test(test_episode):
-    print(f"\n---TEST---")
+    print(f"---TEST---")
     env = gym.make(env_name, render_mode = "human")
     for episode in range(test_episode):
         step = 0
